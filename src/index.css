@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary-dark: #090013;
+    --primary-purple: #6405d6;
+    --secondary-gray: #303030;
+    --accent-red: #f1011d;
+    --accent-pink: #e52381;
+    --text-light: #f5ecee;
+    
+    --gradient-primary: linear-gradient(135deg, #6405d6, #f1011d);
+    --gradient-hover: linear-gradient(135deg, #7a15e6, #ff1127);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--primary-dark);
+    color: var(--text-light);
+  }
+
+  #root {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@layer components {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-hover {
+    background: var(--gradient-hover);
+  }
+  
+  .glass-effect {
+    backdrop-filter: blur(20px);
+    background: rgba(9, 0, 19, 0.8);
+    border: 1px solid rgba(100, 5, 214, 0.2);
+  }
+  
+  .button-primary {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    background: var(--gradient-primary);
+  }
+  
+  .button-primary:hover {
+    background: var(--gradient-hover);
+    transform: scale(1.05);
+  }
+}
+
+@layer utilities {
+  .blur-glow {
+    filter: blur(1px);
+    box-shadow: 0 0 20px rgba(100, 5, 214, 0.5);
+  }
+}

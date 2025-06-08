@@ -1,0 +1,2 @@
+warp::path::internal::Opaque<fn(_) -> std::string::String {<std::string::String as From<_>>::from}>
+Exact<warp::path::internal::Opaque<fn(_) -> std::string::String {<std::string::String as From<_>>::from}>>
