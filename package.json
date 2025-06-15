@@ -1,7 +1,7 @@
 {
   "name": "r5-flowlight",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "R5 Flowlight - Centro de comando unificado para produtividade profissional",
   "keywords": [
