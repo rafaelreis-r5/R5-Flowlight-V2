@@ -1,0 +1,19 @@
+# Configuração dos proprietários de código (code owners) do projeto
+# Estes usuários serão solicitados para revisão em pull requests
+
+# Proprietários principais do projeto
+* @rafaelreis
+
+# Configurações específicas por diretório
+/src-tauri/ @rafaelreis
+/src/ @rafaelreis
+/.github/ @rafaelreis
+
+# Configurações específicas para documentação
+/docs/ @rafaelreis
+
+# Configurações específicas para testes
+/__tests__/ @rafaelreis
+
+# Configurações específicas para CI/CD
+/.github/workflows/ @rafaelreis

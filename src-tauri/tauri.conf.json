@@ -1,48 +1,88 @@
 {
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+  "productName": "R5 Flowlight",
+  "version": "1.0.0",
+  "identifier": "com.r5hub.flowlight",
   "build": {
     "beforeDevCommand": "npm run start",
-    "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist"
+    "beforeBuildCommand": "npx vite build",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
   },
-  "package": {
-    "productName": "R5 Flowlight",
-    "version": "1.0.0"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": true
-    },
-    "bundle": {
-      "active": true,
-      "identifier": "com.r5hub.flowlight",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "targets": "all"
-    },
+  "app": {
+    "macOSPrivateApi": true,
     "security": {
-      "csp": null
-    },
-    "updater": {
-      "active": false
+      "csp": null,
+      "capabilities": []
     },
     "windows": [
       {
+        "label": "main",
         "title": "R5 Flowlight",
-        "width": 720,
-        "height": 480,
+        "width": 1024,
+        "height": 768,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false,
+        "alwaysOnTop": false,
+        "skipTaskbar": false,
         "visible": false,
-        "center": true,
+        "center": true
+      },
+      {
+        "label": "search",
+        "title": "",
+        "width": 600,
+        "height": 400,
+        "resizable": false,
+        "fullscreen": false,
         "decorations": false,
         "transparent": true,
         "alwaysOnTop": true,
-        "skipTaskbar": true
+        "skipTaskbar": true,
+        "visible": false,
+        "center": true,
+        "acceptFirstMouse": true,
+        "tabbingIdentifier": "",
+        "shadow": true,
+        "focus": false,
+        "maximizable": false,
+        "minimizable": false,
+        "closable": false,
+        "hiddenTitle": true,
+        "titleBarStyle": "Overlay",
+        "parent": null
       }
+    ],
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    }
+  },
+  "bundle": {
+    "active": true,
+    "category": "DeveloperTool",
+    "copyright": "",
+    "targets": ["app", "dmg"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "autostart": null,
+    "clipboard-manager": null,
+    "dialog": null,
+    "fs": null,
+    "global-shortcut": null,
+    "http": null,
+    "notification": null,
+    "os": null,
+    "process": null,
+    "shell": null
   }
 }

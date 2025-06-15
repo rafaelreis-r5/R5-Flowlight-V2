@@ -1,5 +1,5 @@
 //! Prompt templates for AI modules
-//! 
+//!
 //! Templates de prompts para módulos de IA
 
 use crate::modules::ModuleType;
@@ -38,30 +38,20 @@ impl PromptTemplates {
             }
         }
     }
-    
+
     /// Obtém um template de prompt para uma funcionalidade específica
     pub fn get_function_prompt(module_type: &ModuleType, function: &str) -> Option<String> {
         match (module_type, function) {
-            (ModuleType::Finance, "market_analysis") => {
-                Some("Analise os dados de mercado fornecidos e forneça insights sobre: \
-                tendências, riscos, oportunidades e recomendações estratégicas.".to_string())
-            },
-            (ModuleType::Health, "symptom_check") => {
-                Some("Com base nos sintomas descritos, forneça informações sobre: \
-                possíveis causas, gravidade, quando procurar ajuda médica e primeiros cuidados.".to_string())
-            },
-            (ModuleType::Nutrition, "meal_planning") => {
-                Some("Crie um plano alimentar considerando: objetivos nutricionais, \
-                restrições alimentares, preferências e valor nutricional equilibrado.".to_string())
-            },
-            (ModuleType::Creator, "content_ideas") => {
-                Some("Gere ideias de conteúdo criativas e relevantes considerando: \
-                público-alvo, plataforma, tendências atuais e objetivos de engagement.".to_string())
-            },
-            (ModuleType::Daily, "calculation") => {
-                Some("Resolva o cálculo ou conversão solicitada de forma precisa e \
-                explique o processo quando necessário.".to_string())
-            },
+            (ModuleType::Finance, "portfolio") => Some("Forneça um resumo do portfólio, incluindo alocação de ativos, rentabilidade e sugestões de rebalanceamento.".to_string()),
+            (ModuleType::Finance, "analysis") => Some("Analise os dados de mercado fornecidos e forneça insights sobre: tendências, riscos, oportunidades e recomendações estratégicas.".to_string()),
+            (ModuleType::Health, "symptoms") => Some("Com base nos sintomas descritos, forneça informações sobre: possíveis causas, gravidade, quando procurar ajuda médica e primeiros cuidados.".to_string()),
+            (ModuleType::Health, "diagnosis") => Some("Forneça um diagnóstico preliminar com base nas informações e oriente sobre próximos passos e cuidados.".to_string()),
+            (ModuleType::Nutrition, "meal-plan") => Some("Crie um plano alimentar considerando: objetivos nutricionais, restrições alimentares, preferências e valor nutricional equilibrado.".to_string()),
+            (ModuleType::Nutrition, "calories") => Some("Forneça informações sobre calorias e composição nutricional do alimento solicitado.".to_string()),
+            (ModuleType::Creator, "content") => Some("Gere ideias de conteúdo criativas e relevantes considerando: público-alvo, plataforma, tendências atuais e objetivos de engagement.".to_string()),
+            (ModuleType::Creator, "design") => Some("Sugira elementos de design e layout atraentes para o conteúdo, incluindo paleta de cores e tipografia.".to_string()),
+            (ModuleType::Daily, "tasks") => Some("Crie uma lista de tarefas diárias prioritizadas com base nas atividades fornecidas.".to_string()),
+            (ModuleType::Daily, "schedule") => Some("Organize um cronograma diário considerando compromissos, durações e intervalos apropriados.".to_string()),
             _ => None
         }
     }

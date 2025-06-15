@@ -1,1 +1,0 @@
-<Map<impl Filter + FilterBase<Extract = (), Error = Infallible> + Copy, {closure@middleware.rs:140:21}> as FilterBase>::Extract == ()

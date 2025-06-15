@@ -1,0 +1,57 @@
+# Definir o tipo de final de linha para todos os arquivos de texto
+* text=auto eol=lf
+
+# Especificar arquivos binários
+*.{png,jpg,jpeg,gif,ico,svg,woff,woff2,ttf,eot} binary
+
+# Forçar final de linha LF para arquivos específicos
+*.{js,jsx,ts,tsx,json,md,html,css,scss,yml,yaml,sh} text eol=lf
+
+# Forçar final de linha CRLF para Windows
+*.{cmd,bat} text eol=crlf
+
+# Arquivos de configuração do Rust
+*.rs text eol=lf
+Cargo.lock text eol=lf
+
+# Arquivos de configuração do Node
+package-lock.json text eol=lf
+yarn.lock text eol=lf
+
+# Arquivos de configuração do editor
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+
+# Arquivos de documentação
+*.md text eol=lf
+LICENSE text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# Arquivos de configuração do VS Code
+.vscode/* text eol=lf
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Garantir que os scripts shell sejam executáveis
+*.sh text eol=lf
+
+# Arquivos de configuração do Tauri
+tauri.conf.json text eol=lf
+
+# Arquivos de configuração do Rust
+Cargo.toml text eol=lf
+
+# Forçar arquivos específicos para LF independentemente do sistema
+*.{css,scss,pcss,html,json,md,yml,yaml,sh,editorconfig,gitattributes,gitignore,lock} text eol=lf
+
+# Forçar arquivos específicos para CRLF no Windows
+*.{cmd,bat} text eol=crlf
+
+# Arquivos que devem permanecer como estão (binários)
+*.{png,jpg,jpeg,gif,ico,svg,woff,woff2,ttf,eot,wasm} binary
+
+# Arquivos que devem ser normalizados (converter para LF)
+*.{js,jsx,ts,tsx,json,md,html,css,scss,yml,yaml,sh} text eol=lf

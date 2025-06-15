@@ -2,30 +2,56 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
-export default defineConfig(async () => ({
+export default defineConfig({
   plugins: [react()],
 
-  // Multi-page app configuration
-  build: {
-    rollupOptions: {
-      input: {
-        main: './index.html',
-        search: './search.html',
-      },
-    },
-  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
-  //
-  // 1. prevent vite from obscuring rust errors
   clearScreen: false,
-  // 2. tauri expects a fixed port, fail if that port is not available
+
+  // Server configuration
   server: {
     port: 1420,
     strictPort: true,
+    cors: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
+    },
+    proxy: {
+      '/auth': {
+        target: 'http://localhost:3030',
+        changeOrigin: true,
+        secure: false,
+        ws: true
+      },
+      '/api': {
+        target: 'http://localhost:3030',
+        changeOrigin: true,
+        secure: false,
+        ws: true
+      }
+    },
     watch: {
-      // 3. tell vite to ignore watching `src-tauri`
+      // Ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
     },
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+      port: 1420
+    }
   },
-}));
+
+  // Optimize deps
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+    esbuildOptions: {
+      // Node.js global to browser globalThis
+      define: {
+        global: 'globalThis',
+      },
+    },
+  },
+});

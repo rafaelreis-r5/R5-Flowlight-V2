@@ -7,7 +7,7 @@ use env_logger::Builder;
 use std::io::Write;
 
 /// Inicializa o sistema de logging
-pub fn init() {
+pub fn init() -> Result<(), Box<dyn std::error::Error>> {
     let mut builder = Builder::from_default_env();
     
     builder
@@ -26,4 +26,6 @@ pub fn init() {
             )
         })
         .init();
+    
+    Ok(())
 }

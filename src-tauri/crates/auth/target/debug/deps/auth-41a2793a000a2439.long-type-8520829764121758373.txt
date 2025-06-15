@@ -1,1 +1,0 @@
-warp::filter::and::And<warp::filter::and::And<warp::filter::and::And<warp::filter::and::And<Exact<warp::path::internal::Opaque<&str>>, Exact<warp::path::internal::Opaque<&str>>>, Exact<warp::path::internal::Opaque<&str>>>, Exact<warp::path::internal::Opaque<&str>>>, Exact<warp::path::internal::Opaque<fn(_) -> std::string::String {<std::string::String as From<_>>::from}>>>

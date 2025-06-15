@@ -11,7 +11,7 @@
     --accent-red: #f1011d;
     --accent-pink: #e52381;
     --text-light: #f5ecee;
-    
+
     --gradient-primary: linear-gradient(135deg, #6405d6, #f1011d);
     --gradient-hover: linear-gradient(135deg, #7a15e6, #ff1127);
   }
@@ -31,11 +31,24 @@
     color: var(--text-light);
   }
 
+  /* Override for launcher window */
+  body.launcher-window {
+    background: transparent !important;
+    overflow: visible !important;
+  }
+
   #root {
     width: 100vw;
     height: 100vh;
     display: flex;
     flex-direction: column;
+  }
+
+  /* Override for launcher window root */
+  #root.launcher-window {
+    background: transparent !important;
+    overflow: visible !important;
+    pointer-events: none !important;
   }
 }
 
@@ -43,22 +56,22 @@
   .gradient-primary {
     background: var(--gradient-primary);
   }
-  
+
   .gradient-hover {
     background: var(--gradient-hover);
   }
-  
+
   .glass-effect {
     backdrop-filter: blur(20px);
     background: rgba(9, 0, 19, 0.8);
     border: 1px solid rgba(100, 5, 214, 0.2);
   }
-  
+
   .button-primary {
     @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
     background: var(--gradient-primary);
   }
-  
+
   .button-primary:hover {
     background: var(--gradient-hover);
     transform: scale(1.05);
@@ -70,4 +83,59 @@
     filter: blur(1px);
     box-shadow: 0 0 20px rgba(100, 5, 214, 0.5);
   }
+}
+/* Draggable and non-draggable regions for Tauri */
+.drag-region {
+  -webkit-app-region: drag;
+}
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Search window specific styles */
+#search-root {
+  width: 100vw;
+  height: 100vh;
+  background: transparent !important;
+  overflow: visible;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 10000;
+}
+
+.search-container {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  pointer-events: auto;
+  z-index: 10000;
+  background: transparent !important;
+  max-width: 600px;
+  min-width: 400px;
+}
+
+.search-window-glass {
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.8);
+  border: none !important;
+  outline: none !important;
+  overflow: visible !important;
+  box-shadow: 
+    0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.draggable {
+  cursor: move;
+  -webkit-app-region: drag;
+}
+
+.draggable * {
+  -webkit-app-region: no-drag;
+}
+
+.draggable input,
+.draggable button {
+  -webkit-app-region: no-drag;
+  cursor: auto;
 }

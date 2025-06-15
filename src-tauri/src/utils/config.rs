@@ -1,5 +1,5 @@
 //! Application configuration
-//! 
+//!
 //! Gerenciamento da configuração da aplicação
 
 use serde::{Deserialize, Serialize};
@@ -11,13 +11,13 @@ use anyhow::Result;
 pub struct AppConfig {
     /// Configurações gerais
     pub general: GeneralConfig,
-    
+
     /// Configurações de busca
     pub search: SearchConfig,
-    
+
     /// Configurações de IA
     pub ai: AIConfig,
-    
+
     /// Configurações dos módulos
     pub modules: ModulesConfig,
 }
@@ -27,13 +27,13 @@ pub struct AppConfig {
 pub struct GeneralConfig {
     /// Tema da interface
     pub theme: String,
-    
+
     /// Idioma da interface
     pub language: String,
-    
+
     /// Iniciar com o sistema
     pub start_with_system: bool,
-    
+
     /// Mostrar na bandeja do sistema
     pub show_in_tray: bool,
 }
@@ -43,18 +43,21 @@ pub struct GeneralConfig {
 pub struct SearchConfig {
     /// Diretórios para indexar
     pub indexed_paths: Vec<PathBuf>,
-    
+
     /// Diretórios para ignorar
     pub ignored_paths: Vec<PathBuf>,
-    
+
     /// Extensões de arquivo para indexar
     pub indexed_extensions: Vec<String>,
-    
+
     /// Tamanho máximo de arquivo (MB)
     pub max_file_size_mb: u64,
-    
+
     /// Intervalo de atualização do índice (segundos)
     pub index_update_interval: u64,
+
+    /// Incluir arquivos ocultos na indexação
+    pub include_hidden: bool,
 }
 
 /// Configurações de IA
@@ -62,19 +65,19 @@ pub struct SearchConfig {
 pub struct AIConfig {
     /// Provedor de IA padrão
     pub default_provider: String,
-    
+
     /// Chave da API OpenAI
     pub openai_api_key: Option<String>,
-    
+
     /// Chave da API Anthropic
     pub anthropic_api_key: Option<String>,
-    
+
     /// Modelo padrão
     pub default_model: String,
-    
+
     /// Temperatura padrão
     pub default_temperature: f32,
-    
+
     /// Máximo de tokens
     pub max_tokens: usize,
 }
@@ -84,7 +87,7 @@ pub struct AIConfig {
 pub struct ModulesConfig {
     /// Módulos habilitados
     pub enabled_modules: Vec<String>,
-    
+
     /// Configurações específicas dos módulos
     pub module_settings: std::collections::HashMap<String, serde_json::Value>,
 }
@@ -120,12 +123,13 @@ impl Default for AppConfig {
                 ],
                 max_file_size_mb: 50,
                 index_update_interval: 300, // 5 minutos
+                include_hidden: false, // Não incluir arquivos ocultos por padrão
             },
             ai: AIConfig {
                 default_provider: "openai".to_string(),
                 openai_api_key: None,
                 anthropic_api_key: None,
-                default_model: "gpt-4".to_string(),
+                default_model: "gpt-3.5-turbo".to_string(),
                 default_temperature: 0.7,
                 max_tokens: 4096,
             },
@@ -147,32 +151,41 @@ impl AppConfig {
     /// Carrega a configuração do arquivo
     pub fn load() -> Result<Self> {
         let config_path = Self::config_path();
-        
-        if config_path.exists() {
+
+        let mut config = if config_path.exists() {
             let content = std::fs::read_to_string(&config_path)?;
-            let config: AppConfig = toml::from_str(&content)?;
-            Ok(config)
+            toml::from_str::<AppConfig>(&content)?
         } else {
             let default_config = Self::default();
             default_config.save()?;
-            Ok(default_config)
+            default_config
+        };
+
+        // Override AI API keys from environment variables if present
+        if let Ok(key) = std::env::var("OPENAI_API_KEY") {
+            config.ai.openai_api_key = Some(key);
         }
+        if let Ok(key) = std::env::var("ANTHROPIC_API_KEY") {
+            config.ai.anthropic_api_key = Some(key);
+        }
+
+        Ok(config)
     }
-    
+
     /// Salva a configuração no arquivo
     pub fn save(&self) -> Result<()> {
         let config_path = Self::config_path();
-        
+
         if let Some(parent) = config_path.parent() {
             std::fs::create_dir_all(parent)?;
         }
-        
+
         let content = toml::to_string_pretty(self)?;
         std::fs::write(&config_path, content)?;
-        
+
         Ok(())
     }
-    
+
     /// Retorna o caminho do arquivo de configuração
     fn config_path() -> PathBuf {
         if let Some(config_dir) = dirs::config_dir() {

@@ -1,0 +1,13 @@
+{
+  "version": "0.2",
+  "language": "pt,pt-BR",
+  "dictionaries": ["pt", "pt_BR"],
+  "words": [
+    "Centro"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
+}
