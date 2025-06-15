@@ -4,25 +4,45 @@
 
 R5 Flowlight é um utilitário de produtividade avançado para macOS e Windows, inspirado no Alfred e Spotlight, que combina busca ultra-rápida com módulos especializados alimentados por inteligência artificial.
 
-## 📌 Últimas Atualizações (Junho/2024)
+## 📌 Últimas Atualizações (Junho/2025)
 
-### 🔒 Sistema de Autenticação Aprimorado
+### 🎯 **v1.1.0 - Sistema de Ícones Nativos e Reestruturação** *(15/06/2025)*
+
+#### 🔧 **Sistema de Ícones Nativos Cross-Platform (Base Implementada)**
+- **Backend Rust/Tauri**: Estrutura completa para extração de ícones nativos macOS e Windows com APIs assíncronas
+- **Cache Inteligente**: Sistema duplo de cache (Rust backend + React frontend) para performance otimizada
+- **Processamento em Lote**: Arquitetura batch para carregar múltiplos ícones simultaneamente
+- **APIs Cross-Platform**: Base preparada para NSWorkspace (macOS) e SHGetFileInfo (Windows)
+
+#### 🎨 **Frontend React/TypeScript (Funcional)**
+- **useFileIcon Hook**: Hook individual com debounce (100ms), cache inteligente e fallback graceful
+- **useFileIcons Hook**: Hook otimizado para listas grandes com processamento em lote
+- **Componente FileIcon**: Componente reutilizável com estados de loading, error handling e lazy loading
+- **Integração SearchWindow**: Estrutura preparada para exibir ícones nativos nos resultados de busca
+
+#### 🧹 **Limpeza e Reestruturação do Projeto**
+- **Remoção módulo auth deprecated**: Eliminado crate auth obsoleto e target files (3.000+ arquivos removidos)
+- **Atualização Tauri v2**: Migração completa para versões RC estáveis (2.0.0-rc.15)
+- **Configuração moderna**: ESLint, Prettier, Husky, lint-staged e cspell configurados
+- **Estrutura de desenvolvimento**: Scripts automatizados, branch protection e workflows CI/CD
+
+#### ⚡ **Melhorias de Performance e Arquitetura**
+- **Dependências otimizadas**: base64, cocoa, windows crates adicionadas para suporte nativo
+- **Sistema de fallback**: Ícones SVG padrão quando extração nativa falha
+- **Tipagem completa**: Interfaces TypeScript para todo o sistema de ícones
+- **Error handling robusto**: Tratamento de erros em todas as camadas (Rust, React, TypeScript)
+
+#### 📋 **Status de Implementação** 
+- ✅ **Completo**: Arquitetura, cache, hooks React, componente FileIcon, fallbacks
+- 🔄 **Em desenvolvimento**: Conversão NSImage→PNG (macOS), HICON→PNG (Windows)
+- 📅 **Próximos passos**: Extração real de ícones nativos, testes cross-platform, otimizações
+
+### 🔒 Sistema de Autenticação (Mantido)
 - Implementação de autenticação JWT segura
 - Fluxo de login otimizado com tratamento de erros
 - Usuário administrador padrão configurado:
   - **Usuário**: SudoAdmin
   - **Senha**: R5hub2025flowlight
-
-### 🛠️ Melhorias Técnicas
-- Configuração do proxy Vite para desenvolvimento
-- Melhorias no gerenciamento de estado de autenticação
-- Logs detalhados para depuração
-- Atualização das dependências de segurança
-
-### 🐛 Correções de Bugs
-- Corrigido loop de redirecionamento na autenticação
-- Resolvido problema de CORS nas requisições de autenticação
-- Melhor tratamento de erros nas chamadas de API
 
 ## 🔒 Proteção de Branch
 
@@ -210,7 +230,7 @@ R5 Flowlight - Sprint de Desenvolvimento Completo
 Metodologia Ágil - Scrum Framework
 📋 Visão Geral do Projeto
 Produto: R5 Flowlight - Launcher de Produtividade com IA
-Versão: 1.0.0 MVP
+Versão: 1.1.0 - Sistema de Ícones Nativos
 Duração Total: 12 semanas (3 sprints de 4 semanas)
 Equipe: Desenvolvimento Full-Stack
 Metodologia: Scrum com entregas incrementais
@@ -303,22 +323,33 @@ Week 1: Configuração Inicial e Infraestrutura
 
 ### 🔍 Busca
 - [x] Configurações Gerais
-  - [x] Número máximo de resultados (implementado)
-  - [x] Delay de busca (implementado)
-  - [x] Busca fuzzy (implementado)
-  - [x] Feedback visual durante a busca (implementado)
-  - [x] Dicas de ferramentas para melhor usabilidade (implementado)
+  - [x] Número máximo de resultados com controle deslizante e validação
+  - [x] Delay de busca otimizado para performance (300ms padrão)
+  - [x] Busca fuzzy com algoritmo de relevância por score
+  - [x] Feedback visual com indicadores de progresso e estado
+  - [x] Dicas de ferramentas contextuais e tooltips informativos
 
-- [x] Tipos de Conteúdo (implementado)
-  - [x] Aplicativos (implementado)
-  - [x] Arquivos (implementado)
-  - [x] Pastas do Sistema (implementado)
-  - [x] Interface de seleção de tipos (implementado)
-  - [x] Persistência das configurações (implementado)
-  - [x] Feedback visual de seleção (implementado)
-  - [x] Validação de seleção mínima (implementado)
+- [x] Tipos de Conteúdo
+  - [x] Aplicativos com detecção automática de instalados
+  - [x] Arquivos com filtros por extensão e tamanho
+  - [x] Pastas do Sistema com exclusões configuráveis
+  - [x] Interface de seleção multi-checkbox com preview
+  - [x] Persistência via localStorage com validação de integridade
+  - [x] Feedback visual com badges de contagem selecionada
+  - [x] Validação de pelo menos um tipo selecionado obrigatório
+
+- [x] **Ícones Nativos (v1.1.0)**
+  - [x] Sistema de extração cross-platform (macOS NSWorkspace, Windows SHGetFileInfo)
+  - [x] Cache inteligente com TTL e LRU para otimização de memória
+  - [x] Processamento em lote para listas grandes (batch processing)
+  - [x] Fallback graceful para ícones SVG quando extração falha
+  - [x] Componente FileIcon React com loading states e error handling
+  - [x] Hooks useFileIcon/useFileIcons com debounce e cache frontend
 
 - [ ] Indexação Avançada (planejado)
+  - [ ] Indexação de conteúdo de arquivos texto com Tantivy
+  - [ ] Detecção automática de tipos MIME para otimização
+  - [ ] Indexação incremental com filesystem watchers
 
 ### ⌨️ Atalhos
 - [ ] Configuração de atalhos (planejado)
