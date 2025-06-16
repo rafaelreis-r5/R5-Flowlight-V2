@@ -1,5 +1,4 @@
 // Em src-tauri/src/bin/check_config_dir.rs
-use std::fs;
 use directories::ProjectDirs;
 
 fn main() {

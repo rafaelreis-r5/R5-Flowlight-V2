@@ -1,0 +1,23 @@
+[package]
+name = "ipc-communication"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+uuid = { workspace = true }
+async-trait = "0.1"
+lazy_static = "1.4"
+
+# Platform-specific IPC
+[target.'cfg(unix)'.dependencies]
+tokio = { workspace = true, features = ["net"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true }
+tokio = { workspace = true, features = ["net"] }

@@ -1,0 +1,46 @@
+[package]
+name = "search-daemon"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Workspace dependencies
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+
+# Tauri for global shortcuts (headless) - REAL IMPLEMENTATION
+tauri = { workspace = true, features = ["macos-private-api"] }
+tauri-plugin-global-shortcut = { workspace = true }
+
+# Internal libraries
+ipc-communication = { path = "../../libs/ipc-communication" }
+shared-core = { path = "../../libs/shared-core" }
+modules = { path = "../../libs/modules" }
+
+# Additional dependencies
+clap = { version = "4.4", features = ["derive"] }
+daemonize = "0.5"
+signal-hook = "0.3"
+signal-hook-tokio = { version = "0.3", features = ["futures-v0_3"] }
+tokio-stream = "0.1"
+uuid = { workspace = true }
+async-trait = "0.1"
+
+[build-dependencies]
+tauri-build = { workspace = true }
+
+[[bin]]
+name = "r5-flowlight-daemon"
+path = "src/main.rs"
+
+[[bin]]
+name = "simple-daemon"
+path = "src/simple_daemon.rs"
+
+[[bin]]
+name = "real-daemon"
+path = "src/real_daemon.rs"

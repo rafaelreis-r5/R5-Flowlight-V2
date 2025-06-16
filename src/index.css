@@ -36,6 +36,17 @@
     background: transparent !important;
     overflow: visible !important;
   }
+  
+  /* Override for overlay window - completamente transparente */
+  body.overlay-window,
+  html.overlay-window {
+    background: transparent !important;
+    overflow: visible !important;
+  }
+  
+  .overlay-window #root {
+    background: transparent !important;
+  }
 
   #root {
     width: 100vw;

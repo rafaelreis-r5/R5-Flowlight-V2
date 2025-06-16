@@ -9,6 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Login } from '../Auth/Login';
 import { SettingsWindow } from '../Settings/SettingsWindow';
 import { toast } from 'react-hot-toast';
+import { showErrorToast } from '../../config/toastConfig';
 import { CustomToaster } from '../Common/CustomToast';
 import { Sidebar } from '../Common/Sidebar';
 import { StatusFooter } from '../Common/StatusFooter';
@@ -90,7 +91,7 @@ const MainWindow: React.FC = () => {
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isVerifyingAuth, setIsVerifyingAuth] = useState(true);
-  
+
   // Load selected module on mount
   useEffect(() => {
     const loadSelectedModule = async () => {
@@ -103,39 +104,39 @@ const MainWindow: React.FC = () => {
         console.error('Error loading selected module:', error);
       }
     };
-    
+
     loadSelectedModule();
   }, []);
-  
+
   // Efeito para verificar o estado de autenticação
   useEffect(() => {
     if (!isAuthLoading) {
       setIsVerifyingAuth(false);
     }
   }, [isAuthLoading]);
-  
+
   // Efeito para lidar com mudanças no estado de autenticação
   useEffect(() => {
     const handleAuthChange = () => {
       setSelectedModule(prev => prev);
     };
-    
+
     window.addEventListener('authStateChanged', handleAuthChange);
-    
+
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'is_admin' || e.key === 'user') {
         window.dispatchEvent(new Event('authStateChanged'));
       }
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
-    
+
     return () => {
       window.removeEventListener('authStateChanged', handleAuthChange);
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [isAuthenticated, isAuthLoading]);
-  
+
   // Efeito para configurar o listener da bandeja do sistema e avisos de módulo
   useEffect(() => {
     const setupTrayListener = async () => {
@@ -155,10 +156,7 @@ const MainWindow: React.FC = () => {
     const setupModuleWarningListener = async () => {
       try {
         const unlisten = await listen<string>('show_module_warning', (event) => {
-          toast.error(event.payload, {
-            duration: 4000,
-            position: 'top-center'
-          });
+          showErrorToast(event.payload);
         });
         return unlisten;
       } catch (error) {
@@ -166,8 +164,29 @@ const MainWindow: React.FC = () => {
       }
     };
 
+    // LISTENER REMOVIDO - Global shortcuts agora gerenciados pelo real-daemon
+    // que se comunica diretamente com o real-overlay
+    //
+    // const setupGlobalShortcutListener = async () => {
+    //   try {
+    //     const unlisten = await listen('trigger_global_shortcut', async () => {
+    //       console.log('🔥 Global shortcut event received from daemon');
+    //       try {
+    //         await invoke('toggle_search_launcher');
+    //         console.log('✅ Search launcher toggled via daemon event');
+    //       } catch (error) {
+    //         console.error('❌ Error toggling search launcher:', error);
+    //       }
+    //     });
+    //     return unlisten;
+    //   } catch (error) {
+    //     console.error('Error setting up global shortcut listener:', error);
+    //   }
+    // };
+
     const cleanup = setupTrayListener();
     const cleanup2 = setupModuleWarningListener();
+    // CLEANUP REMOVIDO - setupGlobalShortcutListener não existe mais
 
     return () => {
       cleanup.then(unlisten => {
@@ -175,7 +194,7 @@ const MainWindow: React.FC = () => {
           unlisten();
         }
       }).catch(console.error);
-      
+
       cleanup2.then(unlisten => {
         if (unlisten && typeof unlisten === 'function') {
           unlisten();
@@ -183,15 +202,15 @@ const MainWindow: React.FC = () => {
       }).catch(console.error);
     };
   }, []);
-  
+
   // Tela de carregamento
   if (isVerifyingAuth || isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f0a1a] to-[#1a0a2e] text-white">
         <div className="animate-pulse text-center">
-          <img 
-            src={r5Logo} 
-            alt="R5 Flowlight Logo" 
+          <img
+            src={r5Logo}
+            alt="R5 Flowlight Logo"
             className="w-16 h-16 mx-auto mb-4 object-contain"
           />
           <p className="text-gray-400">Carregando...</p>
@@ -199,7 +218,7 @@ const MainWindow: React.FC = () => {
       </div>
     );
   }
-  
+
   // Tela de login
   if (!isAuthenticated) {
     return (
@@ -223,11 +242,11 @@ const MainWindow: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f0a1a] to-[#1a0a2e] text-white flex flex-col">
       <Header onSettingsClick={() => setIsSettingsOpen(true)} />
-      
+
       {/* Conteúdo principal */}
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />
-        
+
         <main className="flex-1 overflow-auto p-6">
           <AnimatePresence>
             {isSettingsOpen && (
@@ -237,9 +256,9 @@ const MainWindow: React.FC = () => {
               />
             )}
           </AnimatePresence>
-          
+
           <div className="max-w-6xl mx-auto">
-            <motion.div 
+            <motion.div
               className="text-center mb-12"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -250,7 +269,7 @@ const MainWindow: React.FC = () => {
               </h1>
               <p className="text-gray-400">Escolha um dos módulos abaixo e use ⌘+Space para abrir o launcher</p>
             </motion.div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {modules.map((module, index) => (
                 <motion.div
@@ -262,29 +281,28 @@ const MainWindow: React.FC = () => {
                       : 'hover:bg-white/5'
                   }`}
                   style={{
-                    background: selectedModule === module.id 
+                    background: selectedModule === module.id
                       ? 'linear-gradient(135deg, #6405d6, #f1011d)'
                       : `linear-gradient(135deg, ${module.color.dark}20 0%, ${module.color.light}10 100%)`,
-                    border: selectedModule === module.id 
+                    border: selectedModule === module.id
                       ? '2px solid #6405d6'
                       : '1px solid rgba(255, 255, 255, 0.05)',
-                    ringColor: selectedModule === module.id ? '#6405d6' : 'transparent'
                   }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  whileHover={{ 
+                  whileHover={{
                     y: -5,
                     boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
                   }}
                 >
                   <div className="flex items-center mb-4">
-                    <div 
+                    <div
                       className="p-3 rounded-lg mr-4"
-                      style={{ 
-                        background: selectedModule === module.id 
-                          ? 'rgba(255, 255, 255, 0.2)' 
-                          : module.color.dark 
+                      style={{
+                        background: selectedModule === module.id
+                          ? 'rgba(255, 255, 255, 0.2)'
+                          : module.color.dark
                       }}
                     >
                       {React.cloneElement(module.icon, {
@@ -314,10 +332,10 @@ const MainWindow: React.FC = () => {
           </div>
         </main>
       </div>
-      
+
       {/* Rodapé */}
       <StatusFooter />
-      
+
       {/* Notificações */}
       <CustomToaster />
     </div>

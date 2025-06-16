@@ -1,0 +1,27 @@
+[package]
+name = "test-runner"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ipc-communication = { path = "../libs/ipc-communication" }
+shared-core = { path = "../libs/shared-core" }
+tokio = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+serde_json = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+platform-macos = { path = "../platform/macos" }
+
+[[bin]]
+name = "test-ipc"
+path = "src/test_ipc.rs"
+
+[[bin]]
+name = "test-daemon"
+path = "src/test_daemon.rs"
+
+[[bin]]
+name = "test-overlay"
+path = "src/test_overlay.rs"

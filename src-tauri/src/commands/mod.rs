@@ -5,6 +5,7 @@
 pub mod settings;
 pub mod auth;
 pub mod icons;
+pub mod window;
 
 // Re-export the command functions from the commands module
 pub use settings::commands::{
@@ -40,4 +41,14 @@ pub use icons::{
     get_cache_stats,
     IconResult,
     BatchIconResult
+};
+
+// Re-export window commands
+pub use window::{
+    toggle_search_window,
+    show_search_window,
+    hide_search_window,
+    is_search_window_visible,
+    setup_search_window_events,
+    WindowState
 };

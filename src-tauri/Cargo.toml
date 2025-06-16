@@ -12,37 +12,34 @@ rust-version = "1.70"
 default-run = "r5-flowlight"
 
 [build-dependencies]
-# Uma RC estável para build
-tauri-build = { version = "2.0.0-rc.15", features = [] }
+tauri-build = { workspace = true }
 
 [dependencies]
 # --- TAURI CORE E PLUGINS ---
-tauri = { version = "2.0.0-rc.15", features = [ "macos-private-api", "devtools", "tray-icon" ] }
+tauri = { workspace = true, features = [ "tray-icon" ] }
 tauri-plugin-http = "2.0.0-rc.6"
-tauri-plugin-shell = "2.0.0-rc.5"
+tauri-plugin-shell = { workspace = true }
 tauri-plugin-notification = "2.0.0-rc.5"
 tauri-plugin-os = "2.0.0-rc.5"
 tauri-plugin-fs = "2.0.0-rc.5"
 tauri-plugin-dialog = "2.0.0-rc.5"
-tauri-plugin-global-shortcut = "2.0.0-rc.5"
+tauri-plugin-global-shortcut = { workspace = true }
 tauri-plugin-process = "2.0.0-rc.3"
 tauri-plugin-clipboard-manager = "2.0.0-rc.5"
 tauri-plugin-autostart = "2.0.0-rc.5"
 
 # --- FRAMEWORK ASSÍNCRONO ---
-tokio = { version = "1.38.0", features = ["full"] }
-tokio-util = { version = "0.7", features = ["full"] }
-tokio-stream = { version = "0.1", features = ["fs"] }
+tokio = { workspace = true }
 futures = "0.3"
 
 # --- SERIALIZAÇÃO E DADOS ---
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { workspace = true }
+serde_json = { workspace = true }
 serde_repr = "0.1"
-anyhow = "1.0"
-thiserror = "1.0"
+anyhow = { workspace = true }
+thiserror = { workspace = true }
 chrono = { version = "0.4", features = ["serde", "clock"] }
-uuid = { version = "1.8.0", features = ["v4", "serde"] }
+uuid = { workspace = true }
 
 # --- WEB & API ---
 reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
@@ -53,9 +50,9 @@ tantivy = "0.22"
 postgrest = "1.6.0"
 
 # --- LOGGING E CONFIGURAÇÃO ---
-log = "0.4"
+log = { workspace = true }
 pretty_env_logger = "0.5"
-env_logger = "0.11"
+env_logger = { workspace = true }
 config = "0.14"
 toml = "0.8"
 dotenvy = "0.15"
@@ -81,11 +78,11 @@ rand = "0.8"
 
 # --- PLATAFORMA ESPECÍFICA ---
 [target.'cfg(target_os = "macos")'.dependencies]
-cocoa = "0.25"
-objc = "0.2"
+cocoa = { workspace = true }
+objc = { workspace = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows = { version = "0.52", features = ["Win32_UI_Shell", "Win32_UI_WindowsAndMessaging", "Win32_Graphics_Gdi", "Win32_Foundation"] }
+windows = { workspace = true }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

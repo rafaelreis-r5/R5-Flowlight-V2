@@ -6,6 +6,7 @@ import { Search, Bot, DollarSign, Heart, Apple, Palette, Calendar, X } from 'luc
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileIcon } from '../FileIcon';
 import { useFileIcons } from '../../hooks/useFileIcons';
+import { useGlobalShortcut } from '../../hooks/useGlobalShortcut';
 import '../../index.css';
 
 // Types
@@ -65,6 +66,12 @@ const SearchWindow: React.FC = () => {
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Hook para controle de global shortcut e auto-hide
+  const { hideWindow } = useGlobalShortcut({
+    autoHide: true,
+    hideDelay: 150
+  });
 
   // Ícones nativos para arquivos usando batch
   const allFilePaths = [...appResults.map(r => r.path), ...searchResults.map(r => r.path)];
@@ -220,8 +227,8 @@ const SearchWindow: React.FC = () => {
         setAppResults([]);
         setAiResponse(null);
       } else {
-        // If no text, close the window
-        handleCloseWindow();
+        // If no text, close the window using new hook
+        hideWindow();
       }
     } else if (e.key === 'Tab') {
       e.preventDefault();
@@ -251,38 +258,44 @@ const SearchWindow: React.FC = () => {
   }, [selectedModule]);
 
   const handleCloseWindow = async () => {
-    try {
-      // Reset all states when closing
-      setSearchQuery('');
-      setSearchResults([]);
-      setAppResults([]);
-      setAiResponse(null);
+    // Reset all states when closing
+    setSearchQuery('');
+    setSearchResults([]);
+    setAppResults([]);
+    setAiResponse(null);
 
-      // Hide the search window
-      await invoke('toggle_search_launcher');
-    } catch (error) {
-      console.error('Error closing search window:', error);
-    }
+    // Hide the search window using new hook
+    hideWindow();
   };
 
   const currentModuleFunctions = selectedModule ? moduleFunctions[selectedModule] || [] : [];
 
   return (
-    <div className="search-container" style={{
-      position: 'fixed',
-      top: '50px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '12px',
-      width: '580px',
-      zIndex: 10000
-    }}>
+    <div 
+      data-search-container
+      className="search-container" 
+      style={{
+        position: 'fixed',
+        top: '50px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0px',
+        width: '580px',
+        zIndex: 10000
+      }}>
       {/* Search Bar - Always positioned first */}
       <motion.div
-        className="search-window-glass p-5 rounded-xl"
-        style={{ cursor: 'move', WebkitAppRegion: 'drag' }}
+        className="search-window-glass p-5"
+        style={{ 
+          cursor: 'move', 
+          WebkitAppRegion: 'drag',
+          borderTopLeftRadius: '12px',
+          borderTopRightRadius: '12px',
+          borderBottomLeftRadius: currentModuleFunctions.length > 0 || searchResults.length > 0 || appResults.length > 0 || aiResponse ? '0px' : '12px',
+          borderBottomRightRadius: currentModuleFunctions.length > 0 || searchResults.length > 0 || appResults.length > 0 || aiResponse ? '0px' : '12px'
+        }}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.2 }}
@@ -324,8 +337,13 @@ const SearchWindow: React.FC = () => {
       {/* Module Functions */}
       {currentModuleFunctions.length > 0 && (
         <motion.div
-          className="search-window-glass rounded-xl px-4 py-3"
-          style={{ WebkitAppRegion: 'no-drag' }}
+          className="search-window-glass px-4 py-3"
+          style={{ 
+            WebkitAppRegion: 'no-drag',
+            borderRadius: '0px',
+            borderBottomLeftRadius: searchResults.length > 0 || appResults.length > 0 || aiResponse ? '0px' : '12px',
+            borderBottomRightRadius: searchResults.length > 0 || appResults.length > 0 || aiResponse ? '0px' : '12px'
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
@@ -351,8 +369,13 @@ const SearchWindow: React.FC = () => {
       <AnimatePresence>
         {aiResponse !== null && (
           <motion.div
-            className="search-window-glass rounded-xl p-5"
-            style={{ WebkitAppRegion: 'no-drag' }}
+            className="search-window-glass p-5"
+            style={{ 
+              WebkitAppRegion: 'no-drag',
+              borderRadius: '0px',
+              borderBottomLeftRadius: '12px',
+              borderBottomRightRadius: '12px'
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
@@ -377,8 +400,13 @@ const SearchWindow: React.FC = () => {
       <AnimatePresence>
         {(searchResults.length > 0 || appResults.length > 0) && (
           <motion.div
-            className="search-window-glass rounded-xl p-4 max-h-72 overflow-y-auto"
-            style={{ WebkitAppRegion: 'no-drag' }}
+            className="search-window-glass p-4 max-h-72 overflow-y-auto"
+            style={{ 
+              WebkitAppRegion: 'no-drag',
+              borderRadius: '0px',
+              borderBottomLeftRadius: '12px',
+              borderBottomRightRadius: '12px'
+            }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}

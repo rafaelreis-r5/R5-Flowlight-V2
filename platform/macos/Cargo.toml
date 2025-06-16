@@ -1,0 +1,8 @@
+[package]
+name = "platform-macos"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+objc = { workspace = true }
+cocoa = { workspace = true }

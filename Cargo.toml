@@ -1,0 +1,45 @@
+# R5 Flowlight - Workspace Root
+[workspace]
+resolver = "2"
+
+members = [
+    "src-tauri",
+    "apps/main-app",
+    "apps/search-daemon", 
+    "apps/search-overlay",
+    "apps/config-tool",
+    "libs/shared-core",
+    "libs/ipc-communication",
+    "libs/search-engine",
+    "libs/modules",
+    "platform/macos",
+    "platform/windows",
+    "test-runner"
+]
+
+# Dependências compartilhadas
+[workspace.dependencies]
+tokio = { version = "1.38.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+env_logger = "0.11"
+uuid = { version = "1.8.0", features = ["v4", "serde"] }
+
+# Tauri dependencies
+tauri = { version = "2.0.0-rc.15", features = ["macos-private-api", "devtools"] }
+tauri-build = { version = "2.0.0-rc.15", features = [] }
+tauri-plugin-global-shortcut = "2.0.0-rc.5"
+tauri-plugin-shell = "2.0.0-rc.5"
+
+# Platform-specific dependencies
+cocoa = "0.25"
+objc = "0.2"
+windows = { version = "0.52", features = [
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_Foundation",
+    "Win32_System_Threading",
+    "Win32_UI_Shell"
+] }

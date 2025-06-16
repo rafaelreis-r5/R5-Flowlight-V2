@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R5 Flowlight</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .app-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .app-subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .demo-credentials {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        .demo-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .demo-creds {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        .demo-cred {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        /* Dashboard Screen */
+        .dashboard-screen {
+            display: none;
+        }
+        
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-info h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .header-info p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-connected {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+        
+        .status-disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        .logout-button {
+            padding: 10px 20px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .logout-button:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        .modules-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .section-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .module-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        
+        .module-card.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+        
+        .module-card.active::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 12px;
+            height: 12px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+        
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .module-icon {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+        }
+        
+        .module-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .module-version {
+            font-size: 12px;
+            color: #888;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .module-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .module-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .module-status {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 15px;
+        }
+        
+        .status-active {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+        
+        .status-available {
+            background: rgba(156, 163, 175, 0.1);
+            color: #6b7280;
+        }
+        
+        .activate-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .activate-button:hover {
+            transform: translateY(-1px);
+        }
+        
+        .activate-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .deactivate-button {
+            padding: 8px 16px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .deactivate-button:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .success-message {
+            color: #22c55e;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div class="login-screen" id="loginScreen">
+            <div class="logo">🔥</div>
+            <h1 class="app-title">R5 Flowlight</h1>
+            <p class="app-subtitle">Powerful search and productivity suite</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <input type="text" id="username" class="form-input" placeholder="Enter your username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="login-button" id="loginButton">
+                    Sign In
+                </button>
+                
+                <div id="loginError" class="error-message" style="display: none;"></div>
+            </form>
+            
+            <div class="demo-credentials">
+                <div class="demo-title">Demo Credentials:</div>
+                <div class="demo-creds">
+                    <div class="demo-cred">admin / admin</div>
+                    <div class="demo-cred">user / password</div>
+                    <div class="demo-cred">demo / demo</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Screen -->
+        <div class="dashboard-screen" id="dashboardScreen">
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <div class="header-info">
+                        <h1>Welcome back, <span id="userDisplayName">User</span>!</h1>
+                        <p>Select a module to start using R5 Flowlight</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="status-indicator" id="daemonStatus">
+                            <div class="pulse">●</div>
+                            <span>Checking daemon...</span>
+                        </div>
+                        <button class="logout-button" onclick="logout()">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modules-section">
+                <h2 class="section-title">Available Modules</h2>
+                <p class="section-subtitle">
+                    Choose a module to activate. Once activated, you can use Cmd+Space to open the search overlay.
+                </p>
+                
+                <div class="modules-grid" id="modulesGrid">
+                    <!-- Modules will be dynamically inserted here -->
+                </div>
+                
+                <div id="moduleMessage" class="success-message" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { invoke } from '@tauri-apps/api/core'
+        
+        let currentState = null
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', async () => {
+            await updateAppState()
+            
+            // Check daemon status periodically
+            setInterval(checkDaemonStatus, 5000)
+            
+            // Set focus to username field
+            document.getElementById('username').focus()
+        })
+        
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault()
+            await handleLogin()
+        })
+        
+        async function handleLogin() {
+            const username = document.getElementById('username').value
+            const password = document.getElementById('password').value
+            const loginButton = document.getElementById('loginButton')
+            const loginError = document.getElementById('loginError')
+            
+            loginButton.disabled = true
+            loginButton.textContent = 'Signing in...'
+            loginError.style.display = 'none'
+            
+            try {
+                const user = await invoke('login', { username, password })
+                console.log('Login successful:', user)
+                
+                await updateAppState()
+                showDashboard()
+                
+            } catch (error) {
+                console.error('Login failed:', error)
+                loginError.textContent = error
+                loginError.style.display = 'block'
+            } finally {
+                loginButton.disabled = false
+                loginButton.textContent = 'Sign In'
+            }
+        }
+        
+        async function logout() {
+            try {
+                await invoke('logout')
+                showLogin()
+                await updateAppState()
+            } catch (error) {
+                console.error('Logout failed:', error)
+            }
+        }
+        
+        async function updateAppState() {
+            try {
+                const state = await invoke('get_app_state')
+                currentState = state
+                
+                if (state.logged_in) {
+                    showDashboard()
+                    document.getElementById('userDisplayName').textContent = state.current_user.username
+                    renderModules(state.available_modules)
+                } else {
+                    showLogin()
+                }
+                
+                updateDaemonStatus(state.daemon_connected)
+                
+            } catch (error) {
+                console.error('Failed to get app state:', error)
+            }
+        }
+        
+        function showLogin() {
+            document.getElementById('loginScreen').style.display = 'block'
+            document.getElementById('dashboardScreen').style.display = 'none'
+        }
+        
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none'
+            document.getElementById('dashboardScreen').style.display = 'block'
+        }
+        
+        function renderModules(modules) {
+            const grid = document.getElementById('modulesGrid')
+            grid.innerHTML = ''
+            
+            modules.forEach(module => {
+                const card = createModuleCard(module)
+                grid.appendChild(card)
+            })
+        }
+        
+        function createModuleCard(module) {
+            const card = document.createElement('div')
+            card.className = `module-card ${module.active ? 'active' : ''}`
+            card.innerHTML = `
+                <div class="module-header">
+                    <div class="module-icon">${module.icon}</div>
+                    <div class="module-info">
+                        <h3>${module.name}</h3>
+                        <span class="module-version">v${module.version}</span>
+                    </div>
+                </div>
+                <div class="module-description">${module.description}</div>
+                <div class="module-actions">
+                    <span class="module-status ${module.active ? 'status-active' : 'status-available'}">
+                        ${module.active ? 'Active' : 'Available'}
+                    </span>
+                    ${module.active ? 
+                        `<button class="deactivate-button" onclick="deactivateModule()">Deactivate</button>` :
+                        `<button class="activate-button" onclick="activateModule('${module.id}')">Activate</button>`
+                    }
+                </div>
+            `
+            return card
+        }
+        
+        window.activateModule = async function(moduleId) {
+            const messageEl = document.getElementById('moduleMessage')
+            messageEl.style.display = 'none'
+            
+            // Add loading state
+            const button = event.target
+            button.disabled = true
+            button.textContent = 'Activating...'
+            
+            try {
+                await invoke('activate_module', { moduleId })
+                messageEl.textContent = `Module activated! You can now use Cmd+Space to open the search overlay.`
+                messageEl.className = 'success-message'
+                messageEl.style.display = 'block'
+                
+                await updateAppState()
+                
+            } catch (error) {
+                console.error('Failed to activate module:', error)
+                messageEl.textContent = `Failed to activate module: ${error}`
+                messageEl.className = 'error-message'
+                messageEl.style.display = 'block'
+            } finally {
+                button.disabled = false
+                button.textContent = 'Activate'
+            }
+        }
+        
+        window.deactivateModule = async function() {
+            const messageEl = document.getElementById('moduleMessage')
+            messageEl.style.display = 'none'
+            
+            try {
+                await invoke('deactivate_module')
+                messageEl.textContent = 'Module deactivated. Global shortcuts are now disabled.'
+                messageEl.className = 'success-message'
+                messageEl.style.display = 'block'
+                
+                await updateAppState()
+                
+            } catch (error) {
+                console.error('Failed to deactivate module:', error)
+                messageEl.textContent = `Failed to deactivate module: ${error}`
+                messageEl.className = 'error-message'
+                messageEl.style.display = 'block'
+            }
+        }
+        
+        async function checkDaemonStatus() {
+            try {
+                const connected = await invoke('check_daemon_status')
+                updateDaemonStatus(connected)
+            } catch (error) {
+                console.error('Failed to check daemon status:', error)
+                updateDaemonStatus(false)
+            }
+        }
+        
+        function updateDaemonStatus(connected) {
+            const statusEl = document.getElementById('daemonStatus')
+            
+            if (connected) {
+                statusEl.className = 'status-indicator status-connected'
+                statusEl.innerHTML = '<div>●</div><span>Daemon Connected</span>'
+            } else {
+                statusEl.className = 'status-indicator status-disconnected'
+                statusEl.innerHTML = '<div class="pulse">●</div><span>Daemon Disconnected</span>'
+            }
+        }
+    </script>
+</body>
+</html>

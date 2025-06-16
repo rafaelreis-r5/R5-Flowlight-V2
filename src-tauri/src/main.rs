@@ -13,19 +13,35 @@ pub mod commands;
 // --- Imports Corrigidos para Tauri v2 ---
 use tauri::{AppHandle, Manager, State, WebviewUrl, WebviewWindowBuilder, Runtime, Emitter};
 use tauri::tray::TrayIconEvent;
-// CORREÇÃO: Importa o `GlobalShortcutManagerExt` trait, que adiciona o método .global_shortcut_manager()
-use tauri_plugin_global_shortcut::{GlobalShortcutExt, Builder as GlobalShortcutBuilder, ShortcutState};
-use log::{info, error};
+// GLOBAL SHORTCUT IMPORTS REMOVIDOS - Agora gerenciados pelo real-daemon
+// use tauri_plugin_global_shortcut::{GlobalShortcutExt, Builder as GlobalShortcutBuilder, ShortcutState};
+use tauri_plugin_notification::NotificationBuilder;
+use log::{info, error, warn};
 
-use crate::core::search_engine::SearchEngine;
+// SEARCH ENGINE IMPORT REMOVIDO - Agora gerenciado pelo daemon/overlay
+// use crate::core::search_engine::SearchEngine;
 use crate::utils::logger;
 // Settings commands imports removed as they're called directly in invoke_handler
 
+// ✅ CONFIGURAÇÃO SEGURA: Configura aplicação para funcionar globalmente (SEM operações NSWindow diretas)
+#[cfg(target_os = "macos")]
+fn configure_app_for_global_access<R: Runtime>(app_handle: &AppHandle<R>) -> Result<(), String> {
+    info!("Configurando aplicação para acesso global no macOS");
+    // Por enquanto, apenas log - evitando operações NSWindow que causam crash
+    Ok(())
+}
+
+#[cfg(not(target_os = "macos"))]
+fn configure_app_for_global_access<R: Runtime>(_app_handle: &AppHandle<R>) -> Result<(), String> {
+    info!("Configuração global usando métodos padrão do Tauri");
+    Ok(())
+}
+
 #[derive(Default)]
 pub struct AppState {
+    // Estado apenas para módulos selecionados - busca gerenciada pelo daemon/overlay
     pub selected_module: std::sync::Mutex<Option<String>>,
-    pub search_window_visible: std::sync::Mutex<bool>,
-    pub shortcut_processing: std::sync::Mutex<bool>,
+    // REMOVIDOS: search_window_visible e shortcut_processing (agora no daemon)
 }
 
 fn load_dotenv() -> Result<(), String> {
@@ -75,87 +91,9 @@ async fn get_selected_module(state: State<'_, AppState>) -> Result<String, Strin
     }
 }
 
-#[tauri::command]
-async fn toggle_search_launcher<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
-    info!("=== TOGGLE SEARCH LAUNCHER CALLED ===");
-    let state: State<AppState> = app.state();
-    
-    // Improved debouncing to prevent double triggers
-    {
-        let mut processing = state.shortcut_processing.lock().unwrap();
-        if *processing {
-            info!("Shortcut already processing, skipping");
-            return Ok(());
-        }
-        *processing = true;
-        info!("Processing flag set to true");
-    }
-    
-    // Check if module is selected
-    let selected_module = state.selected_module.lock().unwrap().clone();
-    if selected_module.is_none() {
-        // Reset processing flag immediately
-        *state.shortcut_processing.lock().unwrap() = false;
-        
-        // Show main window with warning
-        if let Some(main_window) = app.get_webview_window("main") {
-            main_window.show().map_err(|e| e.to_string())?;
-            main_window.set_focus().map_err(|e| e.to_string())?;
-            let _ = main_window.emit("show_module_warning", "Escolha um módulo/nicho para usar o Flowlight");
-            info!("Main window shown with module selection warning");
-        }
-        
-        return Ok(());
-    }
-    
-    // Toggle search window (the floating bar)
-    info!("Looking for search window...");
-    if let Some(search_window) = app.get_webview_window("search") {
-        info!("Search window found!");
-        let is_visible = search_window.is_visible().unwrap_or(false);
-        info!("Search window current visibility: {}", is_visible);
-        
-        if is_visible {
-            info!("Hiding search window...");
-            search_window.hide().map_err(|e| e.to_string())?;
-            info!("Search launcher hidden");
-        } else {
-            info!("Showing search window...");
-            // Improved multi-monitor positioning
-            info!("Centering window on active screen...");
-            center_window_on_active_screen(&search_window).await?;
-            
-            // Critical: Set always on top FIRST
-            info!("Setting always on top...");
-            search_window.set_always_on_top(true).map_err(|e| e.to_string())?;
-            
-            // Show window sequence
-            info!("Showing window...");
-            search_window.show().map_err(|e| e.to_string())?;
-            info!("Unminimizing window...");
-            search_window.unminimize().map_err(|e| e.to_string())?;
-            info!("Setting focus...");
-            search_window.set_focus().map_err(|e| e.to_string())?;
-            
-            info!("Search launcher shown and properly positioned");
-        }
-    } else {
-        error!("Search window not found!");
-        *state.shortcut_processing.lock().unwrap() = false;
-        return Err("Search window not found".to_string());
-    }
-    
-    // Reset processing flag with a longer delay to prevent rapid double-triggers
-    let app_clone = app.clone();
-    tauri::async_runtime::spawn(async move {
-        tokio::time::sleep(tokio::time::Duration::from_millis(300)).await;
-        let state: State<AppState> = app_clone.state();
-        *state.shortcut_processing.lock().unwrap() = false;
-        info!("Shortcut processing flag reset");
-    });
-    
-    Ok(())
-}
+// COMANDO MOVIDO PARA O REAL-OVERLAY
+// O toggle da busca agora é gerenciado pelo daemon + overlay
+// O app principal apenas gerencia login, módulos e estado
 
 #[tauri::command]
 async fn show_main_window<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
@@ -186,30 +124,30 @@ async fn center_window_on_active_screen<R: Runtime>(window: &tauri::WebviewWindo
             for monitor in monitors {
                 let pos = monitor.position();
                 let size = monitor.size();
-                
-                if cursor_pos.x >= pos.x as f64 
+
+                if cursor_pos.x >= pos.x as f64
                     && cursor_pos.x <= (pos.x + size.width as i32) as f64
-                    && cursor_pos.y >= pos.y as f64 
+                    && cursor_pos.y >= pos.y as f64
                     && cursor_pos.y <= (pos.y + size.height as i32) as f64 {
-                    
+
                     // Get window size
                     let window_size = window.outer_size().map_err(|e| e.to_string())?;
-                    
+
                     // Calculate center position (slightly above center like Spotlight)
                     let center_x = pos.x + (size.width as i32 - window_size.width as i32) / 2;
                     let center_y = pos.y + (size.height as i32 - window_size.height as i32) / 3; // 1/3 from top
-                    
+
                     window.set_position(tauri::Position::Physical(
                         tauri::PhysicalPosition { x: center_x, y: center_y }
                     )).map_err(|e| e.to_string())?;
-                    
+
                     info!("Window positioned on active monitor at ({}, {})", center_x, center_y);
                     return Ok(());
                 }
             }
         }
     }
-    
+
     // Fallback to simple center
     window.center().map_err(|e| e.to_string())?;
     info!("Window centered using fallback method");
@@ -222,7 +160,7 @@ fn setup_macos_behavior<R: Runtime>(window: &tauri::WebviewWindow<R>) -> Result<
     use cocoa::appkit::{NSApp, NSApplication, NSApplicationActivationPolicy};
     use cocoa::base::nil;
     use objc::{msg_send, sel, sel_impl};
-    
+
     unsafe {
         let app: cocoa::base::id = NSApp();
         // Activate app ignoring other apps (brings to front)
@@ -230,7 +168,7 @@ fn setup_macos_behavior<R: Runtime>(window: &tauri::WebviewWindow<R>) -> Result<
         // Set activation policy to regular (allows focus)
         let _: () = msg_send![app, setActivationPolicy: NSApplicationActivationPolicy::NSApplicationActivationPolicyRegular];
     }
-    
+
     info!("macOS specific behavior configured");
     Ok(())
 }
@@ -242,37 +180,43 @@ fn force_window_to_front<R: Runtime>(window: &tauri::WebviewWindow<R>) -> Result
     // The aggressive NSWindow operations were causing crashes
     window.set_always_on_top(true).map_err(|e| e.to_string())?;
     window.set_focus().map_err(|e| e.to_string())?;
-    
+
     info!("Window forced to front using simplified approach");
     Ok(())
 }
 
 
-// --- Atalho Global Corrigido para v2 ---
-fn setup_global_shortcuts<R: Runtime>(app: &AppHandle<R>) -> Result<(), Box<dyn std::error::Error>> {
-    info!("Setting up global shortcut for CommandOrControl+Space");
-    let manager = app.global_shortcut();
-    
-    // Clear any existing shortcut first
-    let _ = manager.unregister("CmdOrCtrl+Space");
-    
-    // Add small delay before registering to ensure clean state
-    std::thread::sleep(std::time::Duration::from_millis(100));
-    
-    manager.on_shortcut("CmdOrCtrl+Space", move |app_handle, _shortcut, event| {
-        // Only trigger on key press, not release
-        if event.state == ShortcutState::Pressed {
-            info!("Global shortcut triggered - toggling launcher");
-            let app = app_handle.clone();
-            tauri::async_runtime::spawn(async move {
-                let _ = toggle_search_launcher(app).await;
-            });
-        }
-    })?;
-
-    info!("Global shortcut registered successfully");
-    Ok(())
-}
+// --- GLOBAL SHORTCUTS MOVIDOS PARA O DAEMON ---
+// A partir de agora, os atalhos globais são gerenciados pelo real-daemon
+// O app principal apenas gerencia login, módulos e estado
+//
+// fn setup_global_shortcuts<R: Runtime>(app: &AppHandle<R>) -> Result<(), Box<dyn std::error::Error>> {
+//     info!("Setting up global shortcut for CommandOrControl+Space");
+//     let manager = app.global_shortcut();
+//
+//     // Clear any existing shortcut first
+//     let _ = manager.unregister("CmdOrCtrl+Space");
+//
+//     // Add small delay before registering to ensure clean state
+//     std::thread::sleep(std::time::Duration::from_millis(100));
+//
+//     manager.on_shortcut("CmdOrCtrl+Space", move |app_handle, _shortcut, event| {
+//         // Only trigger on key press, not release
+//         if event.state == ShortcutState::Pressed {
+//             info!("Global shortcut triggered - toggling search window only");
+//             let app = app_handle.clone();
+//             tauri::async_runtime::spawn(async move {
+//                 // Usar novo comando que afeta apenas a janela de busca
+//                 if let Err(e) = toggle_search_launcher(app).await {
+//                     error!("Failed to toggle search window: {}", e);
+//                 }
+//             });
+//         }
+//     })?;
+//
+//     info!("Global shortcut registered successfully");
+//     Ok(())
+// }
 
 // --- Função `main` Corrigida para v2 ---
 fn main() {
@@ -286,8 +230,8 @@ fn main() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_clipboard_manager::init())
-        // Register global-shortcut plugin via builder
-        .plugin(GlobalShortcutBuilder::new().build())
+        // GLOBAL SHORTCUT PLUGIN REMOVIDO - Agora gerenciado pelo real-daemon
+        // .plugin(GlobalShortcutBuilder::new().build())
         .on_tray_icon_event(|app, event| {
             if let TrayIconEvent::Click { button: tauri::tray::MouseButton::Left, .. } = event {
                 if let Some(main_window) = app.get_webview_window("main") {
@@ -316,7 +260,8 @@ fn main() {
             ai_query,
             set_selected_module,
             get_selected_module,
-            toggle_search_launcher,
+            // COMANDOS DE BUSCA MOVIDOS PARA O REAL-OVERLAY
+            // toggle_search_launcher,
             show_main_window,
             execute_module_function,
             commands::settings::load_settings_cmd,
@@ -329,6 +274,12 @@ fn main() {
             commands::icons::get_file_icons_batch,
             commands::icons::clear_icon_cache,
             commands::icons::get_cache_stats
+            // COMANDOS DE JANELA DE BUSCA MOVIDOS PARA O REAL-OVERLAY
+            // commands::window::toggle_search_window,
+            // commands::window::show_search_window,
+            // commands::window::hide_search_window,
+            // commands::window::is_search_window_visible,
+            // commands::window::setup_search_window_events
         ])
         .setup(|app| {
             let handle = app.handle().clone();
@@ -342,9 +293,11 @@ fn main() {
                 }
                 info!("Logger and .env loaded.");
 
-                let search_engine = SearchEngine::new().await.expect("Failed to initialize search engine");
-                handle_clone.manage(search_engine);
-                info!("Search engine initialized and managed.");
+                // SEARCH ENGINE MOVIDO PARA O REAL-OVERLAY
+                // O app principal não gerencia mais busca
+                // let search_engine = SearchEngine::new().await.expect("Failed to initialize search engine");
+                // handle_clone.manage(search_engine);
+                info!("App principal inicializado - busca gerenciada pelo daemon/overlay");
             });
 
             // List all available windows to debug
@@ -353,62 +306,44 @@ fn main() {
                 info!("  - Window: {} (label: {})", window.0, window.0);
             }
 
-            if let Err(e) = setup_global_shortcuts(app.handle()) {
-                error!("Failed to set up global shortcuts: {}", e);
+            // GLOBAL SHORTCUTS DESABILITADOS - Agora gerenciados pelo real-daemon
+            // if let Err(e) = setup_global_shortcuts(app.handle()) {
+            //     error!("Failed to set up global shortcuts: {}", e);
+            // }
+            info!("Global shortcuts delegados para o real-daemon - app principal sem atalhos");
+
+            // JANELA DE BUSCA MOVIDA PARA O REAL-OVERLAY
+            // A partir de agora, a janela de busca é gerenciada pelo real-overlay
+            // O app principal apenas gerencia a janela principal (login/módulos)
+            //
+            // if let Some(search_window) = app.get_webview_window("search") {
+            //     info!("Search window found during setup: {:?}", search_window.label());
+            //     search_window.hide().unwrap_or_default();
+            //     search_window.set_always_on_top(true).unwrap_or_default();
+            //     info!("Search window configured as independent floating window");
+            // } else {
+            //     error!("Search window NOT found during setup!");
+            // }
+            info!("Janela de busca delegada para o real-overlay - app principal apenas com janela principal");
+
+            // Configure application for global access first
+            configure_app_for_global_access(app.handle())?;
+
+            // Always show main window - it should remain independent of launcher functionality
+            if let Some(main_window) = app.get_webview_window("main") {
+                main_window.show()?;
+                main_window.set_focus()?;
+                info!("R5 Flowlight: Main window shown (independent of launcher mode)");
             }
-            
-            // Check if search window exists
-            if let Some(search_window) = app.get_webview_window("search") {
-                info!("Search window found during setup: {:?}", search_window.label());
-                // Ensure the search window is hidden initially and independent
-                search_window.hide().unwrap_or_default();
-                search_window.set_always_on_top(true).unwrap_or_default();
-                info!("Search window configured as independent floating window");
-            } else {
-                error!("Search window NOT found during setup!");
-                
-                // Create the search window explicitly if it doesn't exist
-                use tauri::{WebviewWindowBuilder, WebviewUrl};
-                let search_window = WebviewWindowBuilder::new(
-                    app,
-                    "search",
-                    WebviewUrl::App("index.html".into())
-                )
-                .title("")
-                .inner_size(600.0, 400.0)
-                .resizable(false)
-                .decorations(false)
-                .transparent(true)
-                .always_on_top(true)
-                .skip_taskbar(true)
-                .visible(false)
-                .center()
-                .build();
-                
-                match search_window {
-                    Ok(window) => {
-                        info!("Search window created successfully as independent window");
-                        window.hide().unwrap_or_default();
-                    },
-                    Err(e) => {
-                        error!("Failed to create search window: {}", e);
-                    }
-                }
-            }
-            
-            // Check if user has selected a module (indicates setup is done)
+
+            // Check if user has selected a module (just for logging)
             let state: State<AppState> = handle.state();
             let has_selected_module = state.selected_module.lock().unwrap().is_some();
             
-            if !has_selected_module {
-                // Show main window for first-time setup or when no module selected
-                if let Some(main_window) = app.get_webview_window("main") {
-                    main_window.show()?;
-                    main_window.set_focus()?;
-                    info!("R5 Flowlight: Showing main window for setup");
-                }
+            if has_selected_module {
+                info!("Module selected - launcher functionality enabled");
             } else {
-                info!("R5 Flowlight: Started in launcher mode");
+                info!("No module selected - user needs to select a module");
             }
 
             Ok(())
