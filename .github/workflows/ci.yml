@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
   test:
@@ -21,16 +21,16 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'yarn'
+        cache: 'npm'
     
     - name: Install dependencies
-      run: yarn install
+      run: npm ci
     
     - name: Test
-      run: yarn test
+      run: npm test
     
     - name: Build (Tauri)
-      run: yarn tauri build
+      run: npm run tauri build
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -47,12 +47,13 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
+        cache: 'npm'
     
     - name: Install dependencies
-      run: yarn install
+      run: npm ci
     
     - name: Build release
-      run: yarn tauri build --release
+      run: npm run tauri build --release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
