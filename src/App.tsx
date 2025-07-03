@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { getCurrent } from '@tauri-apps/api/window';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { AuthProvider } from './contexts/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -16,7 +16,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const detectWindow = async () => {
       try {
-        const currentWindow = getCurrent();
+        const currentWindow = getCurrentWindow();
         const label = currentWindow.label;
         setWindowLabel(label);
         console.log(`R5 Flowlight: Rendering window "${label}"`);

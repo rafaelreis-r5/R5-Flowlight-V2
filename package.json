@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "tauri dev",
     "dev:daemon": "cargo run --bin real-daemon --manifest-path apps/search-daemon/Cargo.toml",
-    "dev:overlay": "cargo run --manifest-path apps/search-overlay/Cargo.toml",
+    "dev:overlay": "cargo run --bin real-overlay --manifest-path apps/search-overlay/Cargo.toml",
     "dev:full": "npm run dev:daemon & npm run dev:overlay & npm run dev",
     "build": "npm run build:full",
     "build:main": "tauri build",

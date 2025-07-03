@@ -331,9 +331,17 @@ fn main() {
 
             // Always show main window - it should remain independent of launcher functionality
             if let Some(main_window) = app.get_webview_window("main") {
-                main_window.show()?;
-                main_window.set_focus()?;
-                info!("R5 Flowlight: Main window shown (independent of launcher mode)");
+                main_window.show().expect("Failed to show main window");
+                main_window.set_focus().expect("Failed to focus main window");
+                main_window.set_always_on_top(true).expect("Failed to set always on top");
+                info!("R5 Flowlight: Main window shown and brought to front");
+
+                // Adiciona um pequeno delay e remove o always_on_top para comportamento normal
+                let window_clone = main_window.clone();
+                tauri::async_runtime::spawn(async move {
+                    tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+                    window_clone.set_always_on_top(false).expect("Failed to reset always on top");
+                });
             }
 
             // Check if user has selected a module (just for logging)

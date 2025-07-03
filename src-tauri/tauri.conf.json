@@ -13,7 +13,22 @@
     "macOSPrivateApi": true,
     "security": {
       "csp": null,
-      "capabilities": []
+      "capabilities": [
+        {
+          "identifier": "main-capabilities",
+          "description": "Main window capabilities",
+          "windows": ["main"],
+          "permissions": [
+            "notification:allow-is-permission-granted",
+            "core:window:default",
+            "core:app:default",
+            "core:event:default",
+            "shell:default",
+            "fs:default",
+            "dialog:default"
+          ]
+        }
+      ]
     },
     "windows": [
       {
@@ -29,31 +44,6 @@
         "skipTaskbar": false,
         "visible": true,
         "center": true
-      },
-      {
-        "label": "search",
-        "title": "",
-        "width": 600,
-        "height": 400,
-        "resizable": false,
-        "fullscreen": false,
-        "decorations": false,
-        "transparent": true,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "visible": false,
-        "center": false,
-        "acceptFirstMouse": true,
-        "tabbingIdentifier": "search",
-        "shadow": true,
-        "focus": true,
-        "maximizable": false,
-        "minimizable": false,
-        "closable": false,
-        "hiddenTitle": true,
-        "titleBarStyle": "Overlay",
-        "parent": null,
-        "url": "index.html?window=search"
       }
     ],
     "trayIcon": {

@@ -2,8 +2,8 @@
 
 **Centro de comando unificado para produtividade profissional**
 
-> **Versão**: v1.1.0 - Sistema de Ícones Nativos  
-> **Última atualização**: 15/06/2025  
+> **Versão**: v2.0.1 - Estabilização Pós-Refatoramento  
+> **Última atualização**: 03/07/2025  
 > **Tecnologia**: Rust + Tauri 2.0 + React 18 + TypeScript
 
 ---
@@ -755,3 +755,147 @@ A funcionalidade de posicionamento dinâmico da barra de pesquisa seguindo o cur
 
 **Última atualização**: 16/06/2025
 **Versão do projeto**: v2.0.0 - Arquitetura Daemon + Overlay
+
+========================================================================================================
+========================================================================================================
+
+## 🚀 **v2.0.1 - Estabilização Pós-Refatoramento** - 03/07/2025
+
+### 🎯 **Objetivo**
+Estabilizar a arquitetura Daemon + Overlay e corrigir problemas críticos de inicialização e renderização que surgiram após o refatoramento v2.0.0.
+
+### ✅ **Problemas Resolvidos**
+
+1.  **Janela Principal (Frontend em Branco):**
+    *   **Causa:** Erro de `SyntaxError` devido a chamadas incorretas de `getCurrent()` e `getCurrentWindow()` em `src/App.tsx` e `src/hooks/useGlobalShortcut.ts`.
+    *   **Solução:** Atualizadas todas as chamadas `getCurrent()` para `getCurrentWindow()` e corrigidas as importações para `import { getCurrentWindow } from '@tauri-apps/api/window';`.
+    *   **Impacto:** A janela principal agora carrega e exibe o frontend corretamente.
+
+2.  **.env não encontrado / Erro de Parsing:**
+    *   **Causa:** O arquivo `.env` não estava presente no repositório Git (prática de segurança) e/ou continha erros de formatação que impediam seu carregamento.
+    *   **Solução:** O arquivo `.env` foi recriado com a formatação correta e os valores de exemplo. Foi instruído ao usuário a preencher com as chaves reais.
+    *   **Impacto:** A aplicação agora consegue carregar as variáveis de ambiente essenciais para seu funcionamento.
+
+3.  **Barra de Pesquisa (Overlay) Não Aparecia:**
+    *   **Causa:**
+        *   **Erro de Binário:** O script `npm run dev:overlay` não especificava qual binário do Rust (`real-overlay` ou `simple-overlay`) deveria ser executado.
+        *   **Condição de Corrida IPC:** O `real-overlay` tentava se conectar ao `real-daemon` antes que o daemon estivesse pronto, resultando em `Connection refused`.
+        *   **Lógica de Processamento de Mensagens:** A função `listen_for_real_daemon_messages` em `real_overlay.rs` não estava processando corretamente as mensagens `ToggleOverlay` do daemon.
+    *   **Solução:**
+        *   O script `dev:overlay` no `package.json` foi corrigido para `cargo run --bin real-overlay`.
+        *   Implementada lógica de retry na conexão IPC em `apps/search-overlay/src/real_overlay.rs`, permitindo que o overlay espere o daemon.
+        *   Restaurada a lógica de processamento de mensagens `ToggleOverlay` em `listen_for_real_daemon_messages`.
+    *   **Impacto:** A barra de pesquisa agora aparece e desaparece corretamente ao acionar o atalho global.
+
+4.  **Múltiplos Ícones no Dock (macOS):**
+    *   **Causa:** A aplicação principal (`r5-flowlight`) ainda definia uma janela de busca em seu `tauri.conf.json`, criando um conflito com o `search-overlay`.
+    *   **Solução:** A definição da janela de busca foi removida do `src-tauri/tauri.conf.json` da aplicação principal.
+    *   **Impacto:** Apenas um ícone para a aplicação principal e um para o overlay (quando ativo) são exibidos, conforme a arquitetura Daemon + Overlay.
+
+5.  **Erros de Permissão no `tauri.conf.json`:**
+    *   **Causa:** Uso de identificadores de permissão incorretos (ex: `window:default` em vez de `core:window:default`).
+    *   **Solução:** Corrigidos os prefixos das permissões para `core:` no `src-tauri/tauri.conf.json`.
+    *   **Impacto:** A compilação do Tauri é bem-sucedida e as permissões são aplicadas corretamente.
+
+### 🧹 **Limpeza e Otimização**
+
+*   **Cache do Vite:** Recomendada a limpeza manual do cache (`rm -rf node_modules/.vite`) para garantir que as alterações do frontend sejam aplicadas.
+*   **Refatoração de Código:** Pequenas refatorações e correções de warnings em arquivos Rust para melhorar a clareza e a manutenibilidade.
+
+---
+
+========================================================================================================
+========================================================================================================
+
+## 🚀 **v2.0.1 - Estabilização Pós-Refatoramento** - 03/07/2025
+
+### 🎯 **Objetivo**
+Estabilizar a arquitetura Daemon + Overlay e corrigir problemas críticos de inicialização e renderização que surgiram após o refatoramento v2.0.0.
+
+### ✅ **Problemas Resolvidos**
+
+1.  **Janela Principal (Frontend em Branco):**
+    *   **Causa:** Erro de `SyntaxError` devido a chamadas incorretas de `getCurrent()` e `getCurrentWindow()` em `src/App.tsx` e `src/hooks/useGlobalShortcut.ts`.
+    *   **Solução:** Atualizadas todas as chamadas `getCurrent()` para `getCurrentWindow()` e corrigidas as importações para `import { getCurrentWindow } from '@tauri-apps/api/window';`.
+    *   **Impacto:** A janela principal agora carrega e exibe o frontend corretamente.
+
+2.  **.env não encontrado / Erro de Parsing:**
+    *   **Causa:** O arquivo `.env` não estava presente no repositório Git (prática de segurança) e/ou continha erros de formatação que impediam seu carregamento.
+    *   **Solução:** O arquivo `.env` foi recriado com a formatação correta e os valores de exemplo. Foi instruído ao usuário a preencher com as chaves reais.
+    *   **Impacto:** A aplicação agora consegue carregar as variáveis de ambiente essenciais para seu funcionamento.
+
+3.  **Barra de Pesquisa (Overlay) Não Aparecia:**
+    *   **Causa:**
+        *   **Erro de Binário:** O script `npm run dev:overlay` não especificava qual binário do Rust (`real-overlay` ou `simple-overlay`) deveria ser executado.
+        *   **Condição de Corrida IPC:** O `real-overlay` tentava se conectar ao `real-daemon` antes que o daemon estivesse pronto, resultando em `Connection refused`.
+        *   **Lógica de Processamento de Mensagens:** A função `listen_for_real_daemon_messages` em `real_overlay.rs` não estava processando corretamente as mensagens `ToggleOverlay` do daemon.
+    *   **Solução:**
+        *   O script `dev:overlay` no `package.json` foi corrigido para `cargo run --bin real-overlay`.
+        *   Implementada lógica de retry na conexão IPC em `apps/search-overlay/src/real_overlay.rs`, permitindo que o overlay espere o daemon.
+        *   Restaurada a lógica de processamento de mensagens `ToggleOverlay` em `listen_for_real_daemon_messages`.
+    *   **Impacto:** A barra de pesquisa agora aparece e desaparece corretamente ao acionar o atalho global.
+
+4.  **Múltiplos Ícones no Dock (macOS):**
+    *   **Causa:** A aplicação principal (`r5-flowlight`) ainda definia uma janela de busca em seu `tauri.conf.json`, criando um conflito com o `search-overlay`.
+    *   **Solução:** A definição da janela de busca foi removida do `src-tauri/tauri.conf.json` da aplicação principal.
+    *   **Impacto:** Apenas um ícone para a aplicação principal e um para o overlay (quando ativo) são exibidos, conforme a arquitetura Daemon + Overlay.
+
+5.  **Erros de Permissão no `tauri.conf.json`:**
+    *   **Causa:** Uso de identificadores de permissão incorretos (ex: `window:default` em vez de `core:window:default`).
+    *   **Solução:** Corrigidos os prefixos das permissões para `core:` no `src-tauri/tauri.conf.json`.
+    *   **Impacto:** A compilação do Tauri é bem-sucedida e as permissões são aplicadas corretamente.
+
+### 🧹 **Limpeza e Otimização**
+
+*   **Cache do Vite:** Recomendada a limpeza manual do cache (`rm -rf node_modules/.vite`) para garantir que as alterações do frontend sejam aplicadas.
+*   **Refatoração de Código:** Pequenas refatorações e correções de warnings em arquivos Rust para melhorar a clareza e a manutenibilidade.
+
+---
+
+========================================================================================================
+========================================================================================================
+
+## 🚀 **v2.0.1 - Estabilização Pós-Refatoramento** - 03/07/2025
+
+### 🎯 **Objetivo**
+Estabilizar a arquitetura Daemon + Overlay e corrigir problemas críticos de inicialização e renderização que surgiram após o refatoramento v2.0.0.
+
+### ✅ **Problemas Resolvidos**
+
+1.  **Janela Principal (Frontend em Branco):**
+    *   **Causa:** Erro de `SyntaxError` devido a chamadas incorretas de `getCurrent()` e `getCurrentWindow()` em `src/App.tsx` e `src/hooks/useGlobalShortcut.ts`.
+    *   **Solução:** Atualizadas todas as chamadas `getCurrent()` para `getCurrentWindow()` e corrigidas as importações para `import { getCurrentWindow } from '@tauri-apps/api/window';`.
+    *   **Impacto:** A janela principal agora carrega e exibe o frontend corretamente.
+
+2.  **.env não encontrado / Erro de Parsing:**
+    *   **Causa:** O arquivo `.env` não estava presente no repositório Git (prática de segurança) e/ou continha erros de formatação que impediam seu carregamento.
+    *   **Solução:** O arquivo `.env` foi recriado com a formatação correta e os valores de exemplo. Foi instruído ao usuário a preencher com as chaves reais.
+    *   **Impacto:** A aplicação agora consegue carregar as variáveis de ambiente essenciais para seu funcionamento.
+
+3.  **Barra de Pesquisa (Overlay) Não Aparecia:**
+    *   **Causa:**
+        *   **Erro de Binário:** O script `npm run dev:overlay` não especificava qual binário do Rust (`real-overlay` ou `simple-overlay`) deveria ser executado.
+        *   **Condição de Corrida IPC:** O `real-overlay` tentava se conectar ao `real-daemon` antes que o daemon estivesse pronto, resultando em `Connection refused`.
+        *   **Lógica de Processamento de Mensagens:** A função `listen_for_real_daemon_messages` em `real_overlay.rs` não estava processando corretamente as mensagens `ToggleOverlay` do daemon.
+    *   **Solução:**
+        *   O script `dev:overlay` no `package.json` foi corrigido para `cargo run --bin real-overlay`.
+        *   Implementada lógica de retry na conexão IPC em `apps/search-overlay/src/real_overlay.rs`, permitindo que o overlay espere o daemon.
+        *   Restaurada a lógica de processamento de mensagens `ToggleOverlay` em `listen_for_real_daemon_messages`.
+    *   **Impacto:** A barra de pesquisa agora aparece e desaparece corretamente ao acionar o atalho global.
+
+4.  **Múltiplos Ícones no Dock (macOS):**
+    *   **Causa:** A aplicação principal (`r5-flowlight`) ainda definia uma janela de busca em seu `tauri.conf.json`, criando um conflito com o `search-overlay`.
+    *   **Solução:** A definição da janela de busca foi removida do `src-tauri/tauri.conf.json` da aplicação principal.
+    *   **Impacto:** Apenas um ícone para a aplicação principal e um para o overlay (quando ativo) são exibidos, conforme a arquitetura Daemon + Overlay.
+
+5.  **Erros de Permissão no `tauri.conf.json`:**
+    *   **Causa:** Uso de identificadores de permissão incorretos (ex: `window:default` em vez de `core:window:default`).
+    *   **Solução:** Corrigidos os prefixos das permissões para `core:` no `src-tauri/tauri.conf.json`.
+    *   **Impacto:** A compilação do Tauri é bem-sucedida e as permissões são aplicadas corretamente.
+
+### 🧹 **Limpeza e Otimização**
+
+*   **Cache do Vite:** Recomendada a limpeza manual do cache (`rm -rf node_modules/.vite`) para garantir que as alterações do frontend sejam aplicadas.
+*   **Refatoração de Código:** Pequenas refatorações e correções de warnings em arquivos Rust para melhorar a clareza e a manutenibilidade.
+
+---

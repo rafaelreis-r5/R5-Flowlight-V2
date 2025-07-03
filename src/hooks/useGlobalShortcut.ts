@@ -57,7 +57,7 @@ export const useGlobalShortcut = (options: UseGlobalShortcutOptions = {}) => {
 
   // Configurar eventos de janela para auto-hide APENAS NA JANELA DE BUSCA
   useEffect(() => {
-    const currentWindow = getCurrent();
+    const currentWindow = getCurrentWindow();
     
     // Listener para quando a janela perde o foco
     let unlistenBlur: (() => void) | undefined;
@@ -88,7 +88,7 @@ export const useGlobalShortcut = (options: UseGlobalShortcutOptions = {}) => {
 
   // Listener para tecla ESC para esconder a janela APENAS NA JANELA DE BUSCA
   useEffect(() => {
-    const currentWindow = getCurrent();
+    const currentWindow = getCurrentWindow();
     
     const handleKeyDown = (event: KeyboardEvent) => {
       // ✅ CORREÇÃO: ESC só funciona na janela de busca
@@ -108,7 +108,7 @@ export const useGlobalShortcut = (options: UseGlobalShortcutOptions = {}) => {
 
   // Listener para clique fora da janela APENAS NA JANELA DE BUSCA
   useEffect(() => {
-    const currentWindow = getCurrent();
+    const currentWindow = getCurrentWindow();
     
     // ✅ CORREÇÃO: Click outside só funciona na janela de busca
     if (!autoHide || currentWindow.label !== 'search') return;
