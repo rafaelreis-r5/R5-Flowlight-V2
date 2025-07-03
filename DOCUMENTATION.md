@@ -402,7 +402,7 @@ R5 Flowlight/
 │       │       ├── 🪟 Janelas
 │       │       │   └── Windows/
 │       │       │       ├── MainWindow.tsx    # Janela principal
-│       │       │       └── SearchWindow.tsx  # Janela de busca
+│       │       │       └── OverlaySearchWindow.tsx  # Janela de busca flutuante
 │       │       │
 │       │       ├── ⚙️ Configurações
 │       │       │   └── Settings/
