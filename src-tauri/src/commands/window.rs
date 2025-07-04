@@ -265,7 +265,7 @@ fn configure_search_window_for_global_access<R: Runtime>(window: &WebviewWindow<
 
     unsafe {
         if let Ok(hwnd) = window.hwnd() {
-            let hwnd = HWND(hwnd.0);
+            let hwnd = HWND(hwnd as isize);
             
             // Configura como topmost para aparecer sobre todas as outras janelas
             let _ = SetWindowPos(
@@ -360,7 +360,7 @@ fn bring_search_window_to_front<R: Runtime>(window: &WebviewWindow<R>) -> Result
 
     unsafe {
         if let Ok(hwnd) = window.hwnd() {
-            let hwnd = HWND(hwnd.0);
+            let hwnd = HWND(hwnd as isize);
 
             // Versão mais suave - HWND_TOP em vez de HWND_TOPMOST
             let _ = SetWindowPos(
@@ -400,7 +400,7 @@ fn bring_window_to_front<R: Runtime>(window: &WebviewWindow<R>) -> Result<(), St
 
     unsafe {
         if let Ok(hwnd) = window.hwnd() {
-            let hwnd = HWND(hwnd.0);
+            let hwnd = HWND(hwnd as isize);
 
             // Define como topmost com flag de mostrar
             let _ = SetWindowPos(

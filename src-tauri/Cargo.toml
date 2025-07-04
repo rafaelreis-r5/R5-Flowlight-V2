@@ -66,13 +66,21 @@ dirs = "5.0"
 walkdir = "2.5.0"
 regex = "1.10.5"
 tempfile = "3.10.1"
+
+# --- PLATAFORMA ESPECÍFICA ---
 [target.'cfg(target_os = "macos")'.dependencies]
-cocoa = "0.25"
-objc = "0.2"
+cocoa = { version = "0.25", optional = true }
+objc = { version = "0.2", optional = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows = { workspace = true }
-winreg = "0.52.0"
+windows = { workspace = true, features = [
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_Foundation",
+    "Win32_System_Threading",
+    "Win32_UI_Shell",
+    "Win32_Storage_FileSystem"
+]}
+winreg = { version = "0.52.0", features = ["serde"] }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
