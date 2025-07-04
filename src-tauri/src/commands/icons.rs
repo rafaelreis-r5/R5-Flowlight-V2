@@ -145,6 +145,7 @@ async fn get_icon_impl(path: &str, size: u32) -> Result<String, Box<dyn std::err
         Win32::UI::Shell::{SHGetFileInfoW, SHFILEINFOW, SHGFI_ICON, SHGFI_LARGEICON, SHGFI_SMALLICON},
         Win32::UI::WindowsAndMessaging::DestroyIcon,
         Win32::Foundation::MAX_PATH,
+        Win32::Storage::FileSystem::FILE_FLAGS_AND_ATTRIBUTES,
     };
     
     let path_owned = path.to_string();
@@ -163,7 +164,7 @@ async fn get_icon_impl(path: &str, size: u32) -> Result<String, Box<dyn std::err
             
             let result = SHGetFileInfoW(
                 PCWSTR(wide_path.as_ptr()),
-                0,
+                FILE_FLAGS_AND_ATTRIBUTES(0),
                 Some(&mut file_info),
                 std::mem::size_of::<SHFILEINFOW>() as u32,
                 flags,
