@@ -26,8 +26,8 @@ uuid = { workspace = true }
 # Platform-specific
 [target.'cfg(target_os = "macos")'.dependencies]
 platform-macos = { path = "../../platform/macos" }
-objc = "0.2"
-cocoa = "0.25"
+objc = { workspace = true }
+cocoa = { workspace = true }
 core-graphics = "0.25"
 
 [build-dependencies]

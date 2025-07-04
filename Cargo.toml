@@ -35,4 +35,13 @@ tauri-build = { version = "2.0.0-rc.15", features = [] }
 tauri-plugin-global-shortcut = "2.0.0-rc.5"
 tauri-plugin-shell = "2.0.0-rc.5"
 
-# Dependências específicas de plataforma devem ser declaradas em cada crate que as utiliza
+# Dependências específicas de plataforma
+cocoa = { version = "0.25" }
+objc = "0.2"
+windows = { version = "0.52.0", features = [
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_Foundation",
+    "Win32_System_Threading",
+    "Win32_UI_Shell",
+    "Win32_Storage_FileSystem"
+]}
