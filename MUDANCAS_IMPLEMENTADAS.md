@@ -42,6 +42,7 @@ Estabilizar a arquitetura Daemon + Overlay e corrigir problemas críticos de ini
 
 *   **Cache do Vite:** Recomendada a limpeza manual do cache (`rm -rf node_modules/.vite`) para garantir que as alterações do frontend sejam aplicadas.
 *   **Refatoração de Código:** Pequenas refatorações e correções de warnings em arquivos Rust para melhorar a clareza e a manutenibilidade.
+*   **Limpeza de Componentes Legados:** Desativado o componente de busca antigo (`SearchWindow.tsx`) e removida sua chamada do `App.tsx` para centralizar toda a lógica de busca no novo `OverlaySearchWindow.tsx`, eliminando código obsoleto e potencial de conflitos.
 
 ---
 

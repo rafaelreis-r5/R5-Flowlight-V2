@@ -20,4 +20,5 @@ tokio = { workspace = true, features = ["net"] }
 
 [target.'cfg(windows)'.dependencies]
 windows = { workspace = true }
+winreg = { workspace = true }
 tokio = { workspace = true, features = ["net"] }

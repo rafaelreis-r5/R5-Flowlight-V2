@@ -259,20 +259,25 @@ fn configure_search_window_for_global_access<R: Runtime>(window: &WebviewWindow<
 #[cfg(target_os = "windows")]
 fn configure_search_window_for_global_access<R: Runtime>(window: &WebviewWindow<R>) -> Result<(), String> {
     use windows::Win32::UI::WindowsAndMessaging::{
-        SetWindowPos, HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE
+        SetWindowLongPtrW, GWL_EXSTYLE, WS_EX_TOOLWINDOW, WS_EX_NOACTIVATE, WINDOW_EX_STYLE,
+        SetWindowPos, HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE, SWP_NOACTIVATE
     };
     use windows::Win32::Foundation::HWND;
 
     unsafe {
         if let Ok(hwnd) = window.hwnd() {
-            let hwnd = HWND(hwnd.0);
+            // hwnd já é do tipo HWND, só precisamos usar o valor
             
-            // Configura como topmost para aparecer sobre todas as outras janelas
-            let _ = SetWindowPos(
+            // Configura a janela para ser uma "tool window" e não aparecer na barra de tarefas
+            let style = WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
+            SetWindowLongPtrW(hwnd, GWL_EXSTYLE, WINDOW_EX_STYLE(style).0 as isize);
+            
+            // Configura a janela para ficar sempre no topo
+            SetWindowPos(
                 hwnd,
                 HWND_TOPMOST,
                 0, 0, 0, 0,
-                SWP_NOMOVE | SWP_NOSIZE,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE
             );
             
             info!("Janela configurada para aparecer globalmente (Windows)");
@@ -360,7 +365,7 @@ fn bring_search_window_to_front<R: Runtime>(window: &WebviewWindow<R>) -> Result
 
     unsafe {
         if let Ok(hwnd) = window.hwnd() {
-            let hwnd = HWND(hwnd.0);
+            // hwnd já é do tipo HWND, só precisamos usar o valor
 
             // Versão mais suave - HWND_TOP em vez de HWND_TOPMOST
             let _ = SetWindowPos(
@@ -400,7 +405,7 @@ fn bring_window_to_front<R: Runtime>(window: &WebviewWindow<R>) -> Result<(), St
 
     unsafe {
         if let Ok(hwnd) = window.hwnd() {
-            let hwnd = HWND(hwnd.0);
+            let hwnd = HWND(hwnd as isize);
 
             // Define como topmost com flag de mostrar
             let _ = SetWindowPos(

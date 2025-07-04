@@ -66,23 +66,15 @@ dirs = "5.0"
 walkdir = "2.5.0"
 regex = "1.10.5"
 tempfile = "3.10.1"
-winreg = { version = "0.52.0", features = ["serde"], optional = true }
-
-# --- ÍCONES NATIVOS ---
-base64 = "0.21"
-
-# --- AUTENTICAÇÃO ---
-jsonwebtoken = "9.3.0"
-bcrypt = "0.15"
-rand = "0.8"
 
 # --- PLATAFORMA ESPECÍFICA ---
 [target.'cfg(target_os = "macos")'.dependencies]
-cocoa = { workspace = true }
-objc = { workspace = true }
+cocoa = "0.25"
+objc = "0.2"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows = { workspace = true }
+winreg = { workspace = true }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

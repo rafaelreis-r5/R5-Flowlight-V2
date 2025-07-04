@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-objc = { workspace = true }
-cocoa = { workspace = true }
+objc = "0.2"
+cocoa = "0.25"
